@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Widget Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 16px; background: #f7f7fb; color: #222; }
+    .card { background: #fff; border: 1px solid #e3e6ef; border-radius: 10px; padding: 16px; max-width: 720px; margin: 0 auto 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); }
+    h1 { margin-top: 0; }
+    label { display: block; margin: 8px 0 4px; font-weight: 600; }
+    input, textarea, button { width: 100%; box-sizing: border-box; }
+    input, textarea { padding: 10px; border-radius: 8px; border: 1px solid #d3d6de; font-size: 14px; }
+    button { margin-top: 8px; padding: 12px; border: none; border-radius: 8px; background: #2b7cff; color: #fff; font-weight: 700; cursor: pointer; }
+    button:hover { background: #1f66d6; }
+    .row { display: flex; gap: 8px; align-items: center; }
+    .row button { width: auto; padding: 10px 16px; }
+    .chat-log { max-height: 360px; overflow-y: auto; border: 1px solid #e3e6ef; border-radius: 8px; padding: 10px; background: #fafbff; }
+    .msg { margin: 0 0 10px; padding: 10px; border-radius: 8px; }
+    .user { background: #e8f1ff; }
+    .assistant { background: #eef7ec; }
+    .meta { font-size: 12px; color: #666; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Chat Widget Demo</h1>
+    <p>Point to the FastAPI backend, send a message, and verify replies.</p>
+
+    <label for="api-base">API base URL</label>
+    <input id="api-base" value="http://localhost:8000/api/v1" />
+
+    <div class="row" style="margin-top: 8px;">
+      <span class="meta">Session ID: <strong id="session-id"></strong></span>
+      <button id="regen-session" type="button">New Session</button>
+      <button id="ping-health" type="button">Ping Health</button>
+    </div>
+
+    <label for="message">Message</label>
+    <textarea id="message" rows="3" placeholder="Say hello..."></textarea>
+    <button id="send" type="button">Send</button>
+
+    <div class="chat-log" id="chat-log"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

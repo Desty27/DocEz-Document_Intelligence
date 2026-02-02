@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Odisha Govt Portal – Chatbot Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fff7ef;
+    body {
+      margin: 0;
+      font-family: 'Manrope', sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(255,202,150,0.35), transparent 35%),
+                  radial-gradient(circle at 80% 0%, rgba(255,138,61,0.20), transparent 30%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      position: relative;
+      color: #fffaf4;
+      padding: 84px 22px 96px;
+      overflow: hidden;
+      background: linear-gradient(140deg, rgba(255,138,61,0.92), rgba(230,106,18,0.88));
+    }
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 12% 20%, rgba(255,202,150,0.5), transparent 30%),
+                  radial-gradient(circle at 88% 10%, rgba(255,255,255,0.18), transparent 26%);
+      pointer-events: none;
+    }
+    header .content { position: relative; max-width: 1080px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 2.8rem; letter-spacing: -0.8px; }
+    p.lede { margin: 0; font-size: 1.15rem; opacity: 0.95; }
+    main {
+      max-width: 1080px;
+      margin: -60px auto 120px;
+      padding: 40px 16px 0;
+      position: relative;
+      z-index: 1;
+      background: url('https://orsac.odisha.gov.in/images/slides/vision-banner-en.jpg') center/cover no-repeat;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(230, 106, 18, 0.14);
+      border: 1px solid var(--stroke);
+      overflow: hidden;
+    }
+    .carousel {
+      position: relative;
+      height: 260px;
+      margin-bottom: 26px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--stroke);
+      box-shadow: 0 14px 32px rgba(230, 106, 18, 0.18);
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      animation: rotate 18s infinite;
+    }
+    .slide:nth-child(1) { animation-delay: 0s; }
+    .slide:nth-child(2) { animation-delay: 2s; }
+    .slide:nth-child(3) { animation-delay: 4s; }
+    @keyframes rotate {
+      0%, 8% { opacity: 1; }
+      22%, 100% { opacity: 0; }
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 247, 239, 0.82), rgba(255, 247, 239, 0.94));
+      pointer-events: none;
+      z-index: 0;
+    }
+    .content-wrap { position: relative; z-index: 1; padding-bottom: 40px; }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: linear-gradient(150deg, var(--card), #fffaf4);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 16px 40px rgba(230, 106, 18, 0.12);
+    }
+    .card h3 { margin-top: 0; margin-bottom: 6px; }
+    .card p { margin: 0; color: var(--muted); }
+    /* Chat bubble */
+    #chat-launcher {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fffaf4;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 18px 44px rgba(230,106,18,0.32);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      z-index: 10;
+      font-size: 24px;
+      border: 1px solid rgba(255,255,255,0.35);
+    }
+    #chat-launcher:hover { transform: translateY(-2px); box-shadow: 0 22px 50px rgba(230,106,18,0.36); }
+    #chat-panel {
+      position: fixed;
+      right: 22px;
+      bottom: 100px;
+      width: 380px;
+      max-width: calc(100vw - 32px);
+      height: 540px;
+      background: #fffaf4;
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      box-shadow: 0 22px 70px rgba(0,0,0,0.16);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 9;
+    }
+    #chat-panel.open { display: flex; }
+    .chat-header {
+      padding: 14px 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fffaf4;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chat-header .title { font-weight: 800; letter-spacing: 0.2px; }
+    .chat-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      background: #fff9f2;
+    }
+    .bubble {
+      margin-bottom: 12px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      max-width: 88%;
+      line-height: 1.4;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+      white-space: pre-wrap;
+      border: 1px solid var(--stroke);
+      color: var(--text);
+    }
+    .user { margin-left: auto; background: rgba(255,138,61,0.14); }
+    .assistant { margin-right: auto; background: #fffefb; }
+    .chat-input {
+      padding: 10px;
+      border-top: 1px solid var(--stroke);
+      display: grid;
+      grid-template-columns: 1fr 64px;
+      gap: 8px;
+      background: #fffaf4;
+    }
+    textarea {
+      width: 100%;
+      resize: none;
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      padding: 10px;
+      font-family: inherit;
+      min-height: 64px;
+      background: #fffefb;
+      color: var(--text);
+    }
+    button.send {
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fffaf4;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 12px 26px rgba(230,106,18,0.28);
+      letter-spacing: 0.2px;
+    }
+    button.send:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(230,106,18,0.32); }
+    @media (max-width: 720px) {
+      header { padding: 64px 18px 78px; }
+      h1 { font-size: 2.2rem; }
+      main { margin: -40px auto 80px; }
+      #chat-panel { right: 12px; width: calc(100vw - 24px); }
+      #chat-launcher { right: 12px; bottom: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="content">
+      <h1>Government of Odisha Portal</h1>
+      <p class="lede">Demo page showing how a bottom-right chat widget can assist citizens with FAQs.</p>
+    </div>
+  </header>
+
+  <main>
+    
+        </div>
+      </div>
+      <div class="carousel" aria-label="Odisha highlights">
+        <div class="slide" style="background-image:url('https://orsac.odisha.gov.in/images/slides/vision-banner-en.jpg');"></div>
+        <div class="slide" style="background-image:url('https://orsac.odisha.gov.in/images/slides/vision-banner-en.jpg');"></div>
+        <div class="slide" style="background-image:url('https://orsac.odisha.gov.in/images/slides/vision-banner-en.jpg');"></div>
+      </div>
+      <div style="height: 14px;"></div>
+    <div class="info-grid">
+      <div class="card">
+        <h3>Citizen Services</h3>
+        <p>Land records, certificates, RTI, and grievance redressal — all from a unified assistant.</p>
+      </div>
+      <div class="card">
+        <h3>Tourism & Culture</h3>
+        <p>Find highlights like Konark, Puri, and Chilika; get seasonal tips and travel guidance.</p>
+      </div>
+      <div class="card">
+        <h3>Helplines</h3>
+        <p>Know whom to call for health, safety, and emergency services within Odisha.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="chat-launcher" title="Open chat">💬</div>
+
+  <div id="chat-panel">
+    <div class="chat-header">
+      <div>
+        <div class="title">Odisha Assistant</div>
+        <div style="font-size: 12px; opacity: 0.9;">Powered by demo RAG backend</div>
+      </div>
+    </div>
+    <div class="chat-body" id="chat-body"></div>
+    <div class="chat-input">
+      <textarea id="chat-input" placeholder="Ask about services, helplines, tourism..."></textarea>
+      <button class="send" id="send">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = "http://localhost:8000/api/v1";
+    const chatBody = document.getElementById("chat-body");
+    const chatPanel = document.getElementById("chat-panel");
+    const launcher = document.getElementById("chat-launcher");
+    const input = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("send");
+    const slideEls = document.querySelectorAll(".slide");
+    const defaultImages = [
+      "https://images.unsplash.com/photo-1524492449097-edd340443fff?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1563170423-18f482d82cc8?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1526481280695-3c469c2f549b?auto=format&fit=crop&w=1400&q=80",
+    ];
+    let sessionId = `odisha-${Math.random().toString(36).slice(2, 9)}`;
+
+    function addBubble(role, text) {
+      const div = document.createElement("div");
+      div.className = `bubble ${role}`;
+      div.innerHTML = text.replace(/\n/g, "<br>");
+      chatBody.appendChild(div);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+      addBubble("user", message);
+      input.value = "";
+      try {
+        const res = await fetch(`${apiBase}/chat/rag/full`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId, message })
+        });
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        const sources = data.sources?.length ? `\n\nSources:\n- ${data.sources.join("\n- ")}` : "\n(No sources found in documents)";
+        const followups = data.followups?.length ? `\n\nFollow-ups:\n- ${data.followups.join("\n- ")}` : "";
+        addBubble("assistant", `${data.reply}${sources}${followups}`);
+      } catch (err) {
+        addBubble("assistant", `Error contacting assistant: ${err}`);
+      }
+    }
+
+    launcher.addEventListener("click", () => {
+      chatPanel.classList.toggle("open");
+      if (chatPanel.classList.contains("open")) {
+        input.focus();
+        if (!chatBody.dataset.greeted) {
+          addBubble("assistant", "Namaskar! I am your Odisha assistant. Ask me about citizen services, helplines, or tourism highlights.");
+          chatBody.dataset.greeted = "1";
+        }
+      }
+    });
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function applyImages(urls) {
+      slideEls.forEach((el, idx) => {
+        const url = urls[idx] || defaultImages[idx];
+        el.style.backgroundImage = `url('${url}')`;
+      });
+    }
+
+    // Allow backend to define window.CAROUSEL_IMAGES = [url1, url2, url3]
+    const injectedImages = Array.isArray(window.CAROUSEL_IMAGES) ? window.CAROUSEL_IMAGES : [];
+    applyImages(injectedImages.length ? injectedImages : defaultImages);
+  </script>
+</body>
+</html>
