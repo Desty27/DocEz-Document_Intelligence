@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin – Upload Documents</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fff7ef;
+      --card: #fff0e0;
+      --card-strong: #ffd9b3;
+      --accent: #ff8a3d;
+      --accent-strong: #e66a12;
+      --stroke: #f4c79f;
+      --text: #3b1f0b;
+      --muted: #9c5c2c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255,202,150,0.35), transparent 35%),
+                  radial-gradient(circle at 80% 0%, rgba(255,138,61,0.20), transparent 30%),
+                  var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      min-height: 100vh;
+      padding: 32px 18px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .shell {
+      width: 100%;
+      max-width: 1080px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .card {
+      background: linear-gradient(145deg, var(--card), #fffaf4);
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      padding: 22px 22px 26px;
+      box-shadow: 0 18px 50px rgba(230, 106, 18, 0.16);
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 26px;
+      letter-spacing: -0.3px;
+    }
+    p.lead {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 15px;
+    }
+    label { font-weight: 700; display: block; margin: 14px 0 8px; }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      padding: 12px 14px;
+      font-size: 15px;
+      color: var(--text);
+      background: #fffaf4;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 138, 61, 0.14);
+      color: var(--text);
+      border: 1px solid rgba(255, 138, 61, 0.35);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px dashed rgba(255, 138, 61, 0.6);
+      border-radius: 14px;
+      background: rgba(255, 138, 61, 0.08);
+      font-weight: 600;
+      color: var(--text);
+      min-height: 44px;
+    }
+    .btn {
+      appearance: none;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #fffaf4;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      box-shadow: 0 14px 30px rgba(230, 106, 18, 0.28);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 18px 36px rgba(230, 106, 18, 0.32); }
+    .btn:active { transform: translateY(0); }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 10px 0 6px; }
+    .dropzone {
+      margin-top: 8px;
+      border: 2px dashed rgba(230, 106, 18, 0.55);
+      border-radius: 16px;
+      padding: 24px;
+      background: rgba(255, 138, 61, 0.05);
+      display: grid;
+      gap: 10px;
+      place-items: center;
+      text-align: center;
+    }
+    .dropzone strong { color: var(--accent-strong); }
+    .pill-small {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 138, 61, 0.16);
+      border: 1px solid rgba(255, 138, 61, 0.32);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .result {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--card-strong);
+      border: 1px solid var(--stroke);
+      font-weight: 700;
+      color: var(--text);
+      min-height: 46px;
+    }
+    .sidebar {
+      background: linear-gradient(160deg, #ffe1c5, #ffb46c);
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 18px 40px rgba(230, 106, 18, 0.16);
+      display: grid;
+      gap: 14px;
+      color: var(--text);
+    }
+    .sidebar h3 { margin: 0; font-size: 18px; }
+    .sidebar p { margin: 0; color: #5e2f10; line-height: 1.5; }
+    .badge { font-weight: 800; color: #fffaf4; background: rgba(230,106,18,0.9); padding: 6px 10px; border-radius: 10px; display: inline-block; }
+    .section { display: grid; gap: 8px; }
+    .section-title { font-weight: 800; letter-spacing: 0.2px; }
+    .pill-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill-type { padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(255,138,61,0.28); background: rgba(255,138,61,0.16); font-weight: 700; font-size: 13px; }
+    .files { display: grid; gap: 10px; }
+    .file-item { padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,138,61,0.35); background: rgba(255,138,61,0.12); box-shadow: 0 8px 18px rgba(230,106,18,0.14); }
+    .file-name { font-weight: 800; }
+    .file-meta { color: var(--muted); font-weight: 600; font-size: 13px; }
+    .progress {
+      width: 100%;
+      height: 12px;
+      background: rgba(255,138,61,0.15);
+      border-radius: 999px;
+      border: 1px solid rgba(255,138,61,0.35);
+      overflow: hidden;
+    }
+    .progress .bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+      transition: width 0.3s ease;
+    }
+    .btn.ghost {
+      background: rgba(255,138,61,0.16);
+      color: var(--text);
+      box-shadow: none;
+      border: 1px solid rgba(255,138,61,0.32);
+    }
+    .btn.small {
+      padding: 8px 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .file-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .file-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <div class="pill">Multimodal GenAI Chatbot System • Odisha RAG</div>
+      <h1>Upload & Index Documents</h1>
+      <p class="lead">Drop PDFs, Excel, CSV, or TXT to sync with the backend and refresh the knowledge base for the chatbot.</p>
+
+      <label for="api-base">API base URL</label>
+      <input id="api-base" type="text" value="http://localhost:8000/api/v1" />
+
+      <div class="row">
+        <button class="btn" id="refresh">Check Status</button>
+        <div class="status-bar" id="status">Waiting…</div>
+      </div>
+
+      <form id="upload-form">
+        <label>Select or drop a file</label>
+        <div class="dropzone">
+          <div class="pill-small">PDF · XLSX · CSV · TXT</div>
+          <div>Drag & drop here or <strong>browse</strong></div>
+          <input type="file" id="file" required />
+        </div>
+        <div class="row" style="margin-top:14px; justify-content:flex-end;">
+          <button class="btn" type="submit">Upload &amp; Index</button>
+        </div>
+      </form>
+
+      <div class="result" id="result">No actions yet.</div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="badge">Knowledge</div>
+      <div class="section">
+        <div class="section-title">Loading</div>
+        <div class="progress"><div class="bar" id="progress-bar"></div></div>
+        <div class="status-bar" id="status-text">Waiting…</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Base Status</div>
+        <div class="status-bar" id="base-status">--</div>
+      </div>
+      <div class="section">
+        <div class="section-title">File Types</div>
+        <div class="pill-list" id="types"></div>
+      </div>
+      <div class="section">
+        <div class="section-title">Actions</div>
+        <div class="row" style="margin:0; gap:8px;">
+          <button class="btn ghost" id="refresh">Refresh Knowledge Base</button>
+          <button class="btn ghost" id="rebuild">Force Rebuild</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">📁 File Management</div>
+        <div class="row" style="margin:0 0 6px; gap:8px;">
+          <button class="btn ghost small" id="delete-all">Delete All Files</button>
+        </div>
+        <div class="files" id="files-list">No files yet.</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const statusText = document.getElementById("status-text");
+    const baseStatusEl = document.getElementById("base-status");
+    const typesEl = document.getElementById("types");
+    const filesEl = document.getElementById("files-list");
+    const progressBar = document.getElementById("progress-bar");
+    const resultEl = document.getElementById("result");
+    const apiBaseInput = document.getElementById("api-base");
+
+    function renderTypes(typeCounts = {}) {
+      typesEl.innerHTML = "";
+      const entries = Object.entries(typeCounts);
+      if (!entries.length) {
+        typesEl.textContent = "Unknown: 0 chunks";
+        return;
+      }
+      entries.forEach(([type, count]) => {
+        const span = document.createElement("div");
+        span.className = "pill-type";
+        span.textContent = `${type || 'unknown'}: ${count} chunks`;
+        typesEl.appendChild(span);
+      });
+    }
+
+    function renderFiles(files = []) {
+      filesEl.innerHTML = "";
+      if (!files.length) {
+        filesEl.textContent = "No files yet.";
+        return;
+      }
+      files.forEach(f => {
+        const div = document.createElement("div");
+        div.className = "file-item";
+
+        const head = document.createElement("div");
+        head.className = "file-head";
+        const name = document.createElement("div");
+        name.className = "file-name";
+        name.textContent = `📄 ${f.name}`;
+        const actions = document.createElement("div");
+        actions.className = "file-actions";
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn ghost small";
+        delBtn.textContent = "Delete";
+        delBtn.addEventListener("click", () => deleteFile(f.name));
+        actions.appendChild(delBtn);
+        head.appendChild(name);
+        head.appendChild(actions);
+
+        const meta = document.createElement("div");
+        meta.className = "file-meta";
+        meta.textContent = `${f.chunks} chunks • ${f.file_type || 'unknown'}`;
+
+        div.appendChild(head);
+        div.appendChild(meta);
+        filesEl.appendChild(div);
+      });
+    }
+
+    async function fetchStatus() {
+      const base = apiBaseInput.value.replace(/\/$/, "");
+      try {
+        const res = await fetch(`${base}/admin/status`);
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        statusEl.textContent = `Chunks: ${data.chunk_count} | Index: ${data.index_present ? 'ready' : 'missing'}`;
+        baseStatusEl.textContent = data.status_text || `Ready - ${data.file_count || 0} files, ${data.chunk_count || 0} chunks`;
+        statusText.textContent = data.processing ? "Processing..." : "Ready";
+        progressBar.style.width = data.processing ? "65%" : "100%";
+        renderTypes(data.type_counts || {});
+        renderFiles(data.files || []);
+      } catch (err) {
+        statusEl.textContent = `Status error: ${err}`;
+        statusText.textContent = `Status error: ${err}`;
+      }
+    }
+
+    document.getElementById("refresh").addEventListener("click", fetchStatus);
+    document.getElementById("rebuild").addEventListener("click", async () => {
+      const base = apiBaseInput.value.replace(/\/$/, "");
+      statusText.textContent = "Rebuilding...";
+      progressBar.style.width = "45%";
+      try {
+        const res = await fetch(`${base}/admin/rebuild`, { method: "POST" });
+        if (!res.ok) throw new Error(res.statusText);
+        await fetchStatus();
+        resultEl.textContent = "Knowledge base rebuilt.";
+      } catch (err) {
+        statusText.textContent = `Rebuild failed: ${err}`;
+        resultEl.textContent = `Rebuild failed: ${err}`;
+      }
+    });
+
+    document.getElementById("delete-all").addEventListener("click", async () => {
+      const base = apiBaseInput.value.replace(/\/$/, "");
+      resultEl.textContent = "Deleting all files...";
+      try {
+        const res = await fetch(`${base}/admin/all`, { method: "DELETE" });
+        if (!res.ok) throw new Error(res.statusText);
+        await fetchStatus();
+        resultEl.textContent = "All files deleted.";
+      } catch (err) {
+        resultEl.textContent = `Delete all failed: ${err}`;
+      }
+    });
+
+    document.getElementById("upload-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("file");
+      if (!fileInput.files.length) return;
+      const file = fileInput.files[0];
+      const form = new FormData();
+      form.append("file", file);
+      const base = apiBaseInput.value.replace(/\/$/, "");
+      try {
+        const res = await fetch(`${base}/admin/upload`, {
+          method: "POST",
+          body: form,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || res.statusText);
+        resultEl.textContent = `Uploaded ${data.saved}. New chunks: ${data.new_chunks}. Total chunks: ${data.total_chunks}.`;
+        fetchStatus();
+      } catch (err) {
+        resultEl.textContent = `Upload failed: ${err}`;
+      }
+    });
+
+    async function deleteFile(name) {
+      const base = apiBaseInput.value.replace(/\/$/, "");
+      resultEl.textContent = `Deleting ${name}...`;
+      try {
+        const res = await fetch(`${base}/admin/file/${encodeURIComponent(name)}`, { method: "DELETE" });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt || res.statusText);
+        }
+        await fetchStatus();
+        resultEl.textContent = `Deleted ${name}.`;
+      } catch (err) {
+        resultEl.textContent = `Delete failed: ${err}`;
+      }
+    }
+
+    fetchStatus();
+  </script>
+</body>
+</html>
